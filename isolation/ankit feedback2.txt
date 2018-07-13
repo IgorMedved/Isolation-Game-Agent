@@ -1,0 +1,9 @@
+goals:
+Hi Ankit.
+I was pretty close in my estimation of the time I needed for my python tutorials. I ended up learning numpy and pandas a bit. Looked into visualization with matplotlib and pygame. And ended up choosing pyqt as Gui. I had a bit of a problem integrating pygame and pyqt, and spend almost two days figuring why the graphics generated in pygame was not showing in custom QWidget. Finally it turned out that it was a simple matter of laying it out correctly, and setting minimum size of custom QWidget after which it worked as I intended.
+On a more practical end I wrote a program that drew chess board in pygames and put queens on it as required by the solution to 8 queen problem. I integrated the graphics into the pyqt interface and added the slider. When you move the slider it shows one of the 92 solutions to the problem on the board.
+Now I am finishing the robot navigation problem (should be done in the next couple of hours) and then on to Isolation
+So the plan for next week should be making an interface of the isolation game, and implementing the adverserial search. I did not finish watching the project introductory videos, so I might end up adjusting the exact goals to reflect on the requirements. But the idea is to be close to done or done with isolation project in a weeks time.
+
+Issues
+Nothing really major. As I mentioned showing the graphics in custom qwidget was a pain. But I figured it out

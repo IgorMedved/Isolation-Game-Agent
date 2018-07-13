@@ -67,6 +67,34 @@ def open_move_score(game, player):
 
     return float(len(game.get_legal_moves(player)))
 
+def open_move_score_mod(game, player):
+    """The basic evaluation function described in lecture that outputs a score
+        equal to the number of moves open for your computer player on the board, modified to include the center_score
+        When two positions have the same mobility score the one that produces a move closer to the center would be prefered
+
+        Parameters
+        ----------
+        game : `isolation.Board`
+            An instance of `isolation.Board` encoding the current state of the
+            game (e.g., player locations and blocked cells).
+
+        player : hashable
+            One of the objects registered by the game object as a valid player.
+            (i.e., `player` should be either game.__player_1__ or
+            game.__player_2__).
+
+        Returns
+        ----------
+        float
+            The heuristic value of the current game state
+        """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    return float(len(game.get_legal_moves(player))) + (1 - center_score(game,player)/1000)
 
 def improved_score(game, player):
     """The "Improved" evaluation function discussed in lecture that outputs a
@@ -99,6 +127,79 @@ def improved_score(game, player):
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
     return float(own_moves - opp_moves)
 
+def improved_score_sym(game, player):
+    """The "Improved" evaluation function discussed in lecture that outputs a
+    score equal to the difference in the number of moves available to the
+    two players. It also evaluates if the symmetry is present
+
+    Parameters
+    ----------
+    game : `isolation.Board`
+        An instance of `isolation.Board` encoding the current state of the
+        game (e.g., player locations and blocked cells).
+
+    player : hashable
+        One of the objects registered by the game object as a valid player.
+        (i.e., `player` should be either game.__player_1__ or
+        game.__player_2__).
+
+    Returns
+    ----------
+    float
+        The heuristic value of the current game state
+    """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    score = 0.
+    if game.issymmetrical():
+        player.symmetry_count+=1
+        print (player.symmetry_count, game.to_string())
+        if game.active_player == player:
+            score = -1e6
+        else:
+            score = 1e6
+
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    score += (own_moves - opp_moves)
+    return score
+
+def improved_score_mod(game, player):
+    """The "Improved" evaluation function discussed in lecture that outputs a
+    score equal to the difference in the number of moves available to the
+    two players. modified to include the center_score
+    When two positions have the same mobility score the one that produces a move closer to the center would be preferred
+
+    Parameters
+    ----------
+    game : `isolation.Board`
+        An instance of `isolation.Board` encoding the current state of the
+        game (e.g., player locations and blocked cells).
+
+    player : hashable
+        One of the objects registered by the game object as a valid player.
+        (i.e., `player` should be either game.__player_1__ or
+        game.__player_2__).
+
+    Returns
+    ----------
+    float
+        The heuristic value of the current game state
+    """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves - opp_moves + center_score(game,player)/32)
 
 def center_score(game, player):
     """Outputs a score equal to square of the distance from the center of the
@@ -198,6 +299,41 @@ class GreedyPlayer():
         _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
         return move
 
+class ImprovedPlayer ():
+    """Player that chooses next move to maximize heuristic score. This is
+        equivalent to a minimax search agent with a search depth of one.
+        """
+
+    def __init__(self, score_fn=improved_score):
+        self.score = score_fn
+
+    def get_move(self, game, time_left):
+        """Select the move from the available legal moves with the highest
+        heuristic score.
+
+        Parameters
+        ----------
+        game : `isolation.Board`
+            An instance of `isolation.Board` encoding the current state of the
+            game (e.g., player locations and blocked cells).
+
+        time_left : callable
+            A function that returns the number of milliseconds left in the
+            current turn. Returning with any less than 0 ms remaining forfeits
+            the game.
+
+        Returns
+        ----------
+        (int, int)
+            The move in the legal moves list with the highest heuristic score
+            for the current game state; may return (-1, -1) if there are no
+            legal moves.
+        """
+        legal_moves = game.get_legal_moves()
+        if not legal_moves:
+            return (-1, -1)
+        _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+        return move
 
 class HumanPlayer():
     """Player that chooses a move according to user's input."""
